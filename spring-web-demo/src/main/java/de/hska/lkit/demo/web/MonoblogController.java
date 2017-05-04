@@ -8,9 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class GreetingController {
 
-	@RequestMapping(value = "/greeting")
-	public String greetingSubmit(@ModelAttribute Greeting greeting, Model model) {
-		model.addAttribute("greeting", greeting != null ? greeting : new Greeting());
-		return greeting.isBootstrap() ? "greeting-bs" : "greeting";
+	@RequestMapping(value = "/")
+	public void greetingSubmit(@ModelAttribute Monoblog monoblog, Model model) {
 	}
 }
