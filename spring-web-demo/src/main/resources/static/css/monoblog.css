@@ -5,14 +5,14 @@
 }
 
 #textarea{
-color:lime;
-font-family:monospace;
-background-color: black;
+	color:lime;
+	font-family:monospace;
+	background-color: black;
 
-text-align:left;
+	text-align:left;
 	
-border: 0;
-padding: 0;
+	border: 0;
+	padding: 0;
 	
 	position: absolute;
 		top: 0;
@@ -21,23 +21,26 @@ padding: 0;
 		height: 97vh;
 		
 		
-resize : none;
-outline: none;
+	resize : none;
+	outline: none;
 }
 
 #command {
 	
-color: lime;
-font-family:monospace;
-background-color: black;
+	color: lime;
+	font-family: monospace;
+	background-color: black;
 	
-border: 0;
-padding:0;
+	border: 0;
+	padding:0;
 	
 	position: absolute;
         left: 0;
         bottom: 0;
 		
-		width: 100vw;
-		height: 3vh;
+	width: 100vw;
+	height: 3vh;
+	
+	outline: none;
+	box-shadow: none;
 }
