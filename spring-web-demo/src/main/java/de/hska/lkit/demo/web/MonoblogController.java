@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class MonoblogController {
 
-	@RequestMapping(value = "/lala")
+	@RequestMapping(value = "")
 	public String test(@ModelAttribute Monoblog monoblog, Model model) {
 	
 	return "monoblog";
