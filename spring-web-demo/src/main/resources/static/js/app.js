@@ -1,5 +1,5 @@
 var stompClient = null;
-
+alert("initialized jscript");
 function setConnected(connected) {
     $("#connect").prop("disabled", connected);
     $("#disconnect").prop("disabled", !connected);
@@ -9,11 +9,14 @@ function setConnected(connected) {
     else {
         $("#conversation").hide();
     }
+    alert("want to reload!");
     $("#greetings").html("");
 }
 
 function connect() {
+    alert("a");
     var socket = new SockJS('/gs-guide-websocket');
+    alert("b");
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
         setConnected(true);
@@ -41,6 +44,7 @@ function showGreeting(message) {
 }
 
 $(function () {
+    alert("wtf?");
     $("form").on('submit', function (e) {
         e.preventDefault();
     });
