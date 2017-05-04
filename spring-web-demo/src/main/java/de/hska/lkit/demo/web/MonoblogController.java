@@ -6,9 +6,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-public class GreetingController {
+public class MonoblogController {
 
-	@RequestMapping(value = "/")
-	public void greetingSubmit(@ModelAttribute Monoblog monoblog, Model model) {
+	@RequestMapping(value = "/lala")
+	public String test(@ModelAttribute Monoblog monoblog, Model model) {
+	
+	return "monoblog";
 	}
 }

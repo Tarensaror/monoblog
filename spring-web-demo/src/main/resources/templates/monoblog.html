@@ -1,20 +1,21 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org" id="all">
-<link rel="stylesheet" href="monoblog.css">
+
 	<head>
+		<link rel="stylesheet" type="text/css" th:href="@{/css/monoblog.css}"/>
 		<title>Getting Started</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	</head>
+	
 	<body>
-		<textarea readonly id="textarea">
+		<textarea readonly="readonly" id="textarea">
 		
 		</textarea>
 		
 		
-		
+	
+		<input type="text" placeholder="type command here" id="command" /> 	
+	
 	</body>
 
-	<footer>
-	<input type="text" placeholder="type command here" id="command" /> 	
-	</footer>
 </html>
