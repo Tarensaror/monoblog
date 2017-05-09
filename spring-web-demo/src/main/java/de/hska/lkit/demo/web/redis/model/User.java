@@ -1,4 +1,4 @@
-package de.hska.lkit.demo.redis.model;
+package de.hska.lkit.demo.web.redis.model;
 
 import java.io.Serializable;
 

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import de.hska.lkit.demo.redis.model.User;
-import de.hska.lkit.demo.redis.repo.UserRepository;
+import de.hska.lkit.demo.redis.repo.UserDataRepo;
 
 /**
  * @author knad0001
@@ -20,10 +20,10 @@ import de.hska.lkit.demo.redis.repo.UserRepository;
 @Controller
 public class UserController {
 
-	private final UserRepository userRepository;
+	private final UserDataRepo userRepository;
 
 	@Autowired
-	public UserController(UserRepository userRepository) {
+	public UserController(UserDataRepo userRepository) {
 		super();
 		this.userRepository = userRepository;
 	}

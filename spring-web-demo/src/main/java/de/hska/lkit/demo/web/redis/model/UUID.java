@@ -1,4 +1,4 @@
-package de.hska.lkit.demo.web.redis;
+package de.hska.lkit.demo.web.redis.model;
 
 public class UUID {
 	

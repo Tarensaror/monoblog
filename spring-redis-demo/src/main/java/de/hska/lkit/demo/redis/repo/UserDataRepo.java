@@ -4,7 +4,7 @@ import java.util.Map;
 
 import de.hska.lkit.demo.redis.model.User;
 
-public interface UserRepository {
+public interface UserDataRepo {
 	
 	/**
 	 * save user to repository

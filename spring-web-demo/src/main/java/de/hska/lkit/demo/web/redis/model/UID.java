@@ -1,4 +1,4 @@
-package de.hska.lkit.demo.web.redis;
+package de.hska.lkit.demo.web.redis.model;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;

@@ -10,6 +10,8 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 public class RedisConfiguration {
+	
+	
 	@Bean
 	public JedisConnectionFactory getConnectionFactory() {
 		// falls andere als die Default Werte gesetzt werden sollen

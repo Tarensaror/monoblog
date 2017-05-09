@@ -20,7 +20,7 @@ import org.springframework.data.redis.support.atomic.RedisAtomicLong;
 import org.springframework.stereotype.Repository;
 
 import de.hska.lkit.demo.redis.model.User;
-import de.hska.lkit.demo.redis.repo.UserDataRepo;
+import de.hska.lkit.demo.redis.repo.UserRepository;
 
 /**
  * @author knad0001
@@ -31,7 +31,7 @@ import de.hska.lkit.demo.redis.repo.UserDataRepo;
  *
  */
 @Repository
-public class UserRepositoryImpl implements UserDataRepo {
+public class MyUserRepositoryImpl implements UserRepository {
 
 	/**
 	 * 
@@ -43,6 +43,8 @@ public class UserRepositoryImpl implements UserDataRepo {
 	private static final String KEY_HASH_ALL_USERS 		= "all:user";
 	
 	private static final String KEY_PREFIX_USER 	= "user:";
+	
+	private static final String KEY_NAME_TO_ID		= "name:";
 
 	/**
 	 * to generate unique ids for user
@@ -121,7 +123,7 @@ public class UserRepositoryImpl implements UserDataRepo {
 
 		// to show how objects can be saved
 		// be careful, if username already exists it's not added another time
-		String key = KEY_PREFIX_USER + user.getUsername();
+		String key = KEY_PREFIX_USER + id;
 		srt_hashOps.put(key, "id", id);
 		srt_hashOps.put(key, "username", user.getUsername());
 		srt_hashOps.put(key, "password", user.getPassword());
@@ -134,6 +136,8 @@ public class UserRepositoryImpl implements UserDataRepo {
 
 		// to show how objects can be saved
 		rt_hashOps.put(KEY_HASH_ALL_USERS, key, user);
+		
+		srt_
 
 	}
 
