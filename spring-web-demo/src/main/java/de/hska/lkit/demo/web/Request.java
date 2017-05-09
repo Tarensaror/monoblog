@@ -28,11 +28,11 @@ public class Request {
     }
     
     public String getCommand() {
-        return command;
+        return command == null ? "" : command;
     }
     
     public String getArguments() {
-    	return arguments;
+    	return arguments == null ? "" : arguments;
     }
 
     public String getToken() {
