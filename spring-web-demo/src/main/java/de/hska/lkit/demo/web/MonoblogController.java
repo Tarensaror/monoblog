@@ -18,7 +18,7 @@ public class MonoblogController {
 	
 	@MessageMapping("/command")
 	@SendToUser("/queue/replies")
-	public Reply commandRequest(Request request) {
+	public Result commandRequest(Request request) {
 		return Command.process(request);
 	}
 	
