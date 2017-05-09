@@ -57,7 +57,10 @@ function connect() {
 
         client.subscribe('/user/queue/replies', function(reply) {
         	state = Status.READY
-            write_output(JSON.parse(reply.body).message);
+        	var data = JSON.parse(reply.body);
+            write_output(data.message);
+            
+            if (data.success && data.command == 'login') token = data.userdata;
         });
     });
 }

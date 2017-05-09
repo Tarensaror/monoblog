@@ -10,11 +10,23 @@ public class Request {
     public Request() {}
 
     public Request(String command, String arguments, String token) {
-        this.command = command;
-        this.arguments = arguments;
-        this.token = token;
+        setCommand(command);
+        setArguments(arguments);
+        setToken(token);
     }
 
+    public void setCommand(String command) {
+    	this.command = command.trim();
+    }
+    
+    public void setArguments(String arguments) {
+    	this.arguments = arguments;
+    }
+    
+    public void setToken(String token) {
+    	this.token = token;
+    }
+    
     public String getCommand() {
         return command;
     }

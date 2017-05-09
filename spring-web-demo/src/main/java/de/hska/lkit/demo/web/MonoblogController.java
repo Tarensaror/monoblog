@@ -12,16 +12,15 @@ import org.springframework.messaging.simp.annotation.SendToUser;
 public class MonoblogController {
 
 	@RequestMapping(value = "")
-	public String test(@ModelAttribute Monoblog monoblog, Model model) {
+	public String index(@ModelAttribute Monoblog monoblog, Model model) {
 		return "monoblog";
 	}
 	
-	
-	 @MessageMapping("/command")
-	 @SendToUser("/queue/replies")
-	 public Reply greeting(Request request) throws Exception {
-	    return new Reply("Reply: " + request.getCommand() + " : " + request.getArguments() + " : " + request.getToken());
-	 }
+	@MessageMapping("/command")
+	@SendToUser("/queue/replies")
+	public Reply commandRequest(Request request) {
+		return Command.process(request);
+	}
 	
 
 }
