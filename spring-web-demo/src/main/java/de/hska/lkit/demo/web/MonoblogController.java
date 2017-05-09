@@ -20,8 +20,6 @@ public class MonoblogController {
 	 @MessageMapping("/command")
 	 @SendToUser("/queue/replies")
 	 public Reply greeting(Request request) throws Exception {
-		System.out.println("Received request!");
-	    Thread.sleep(1000); // simulated delay
 	    return new Reply("Reply: " + request.getCommand() + " : " + request.getArguments() + " : " + request.getToken());
 	 }
 	
