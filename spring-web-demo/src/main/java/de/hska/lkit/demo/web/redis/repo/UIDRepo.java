@@ -31,6 +31,7 @@ public class UIDRepo {
 	
 	
 	private final String KEY_PREFIX_NAME 	= "name:";
+	private final String KEY_SUFFIX_USER = ":user";
 
 	private RedisAtomicLong userid;
 	
@@ -71,7 +72,7 @@ public class UIDRepo {
 	 * @return true, if created successfully, false if already existed.
 	 */
 	public boolean createUser(String name, String password) {		
-		String key = KEY_PREFIX_NAME + name;
+		String key = KEY_PREFIX_NAME + name + KEY_SUFFIX_USER;
 		
 		if(isExistingUser(name)) {
 			System.out.println("Already there");
@@ -104,7 +105,7 @@ public class UIDRepo {
 	 */
 	private boolean isExistingUser(String name) {
 		System.out.println("does it");
-		String key = KEY_PREFIX_NAME + name;
+		String key = KEY_PREFIX_NAME + name + KEY_SUFFIX_USER;
 		
 		if(stringRedisTemplate.hasKey(key)) {
 			return true;
@@ -125,7 +126,8 @@ public class UIDRepo {
 	 */
 	public String getId(String name) {
 		if(isExistingUser(name)) {
-			return srt_hashOps.get((KEY_PREFIX_NAME + name), "id");
+			System.out.println("exists");
+			return String.valueOf(srt_hashOps.get((KEY_PREFIX_NAME + name + KEY_SUFFIX_USER), "id"));
 		}
 		return "none";
 	}

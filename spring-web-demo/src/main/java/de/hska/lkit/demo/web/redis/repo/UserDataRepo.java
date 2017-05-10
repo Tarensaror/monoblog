@@ -23,6 +23,7 @@ import de.hska.lkit.demo.web.redis.repo.UIDRepo;
 public class UserDataRepo {
 	
 	private static String KEY_PREFIX_USER = "user:";
+	private static String KEY_SUFFIX_USERDATA = ":userdata";
 	
 //	private RedisAtomicLong userid;
 //	private UIDRepo uidrepo;
@@ -55,7 +56,7 @@ public class UserDataRepo {
 
 	public void saveUserData(UserData userdata) {
 			
-		String key = (KEY_PREFIX_USER + userdata.getId());
+		String key = (KEY_PREFIX_USER + userdata.getId() + KEY_SUFFIX_USERDATA);
 		
 		srt_hashOps.put(key, "name", userdata.getName());
 		srt_hashOps.put(key, "password", userdata.getPassword());	
@@ -63,9 +64,10 @@ public class UserDataRepo {
 	}
 	
 	public String getName(String id) {
-		String key = KEY_PREFIX_USER + id;
+		String key = KEY_PREFIX_USER + id + KEY_SUFFIX_USERDATA;
 		
 		if(stringRedisTemplate.hasKey(key)) {
+			System.out.println("found");
 			return (srt_hashOps.get(key, "name"));
 		}
 		else {
@@ -76,7 +78,7 @@ public class UserDataRepo {
 	
 	public String getPassword(String id) {
 		
-		String key = KEY_PREFIX_USER + id;
+		String key = KEY_PREFIX_USER + id + KEY_SUFFIX_USERDATA;
 		
 		if(stringRedisTemplate.hasKey(key)) {
 			return (srt_hashOps.get(key, "password"));
