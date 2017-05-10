@@ -9,6 +9,7 @@ import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.data.redis.support.atomic.RedisAtomicLong;
@@ -16,13 +17,15 @@ import org.springframework.stereotype.Repository;
 
 // import de.hska.lkit.demo.web.redis.model.User;
 import de.hska.lkit.demo.web.redis.model.UserData;
+import de.hska.lkit.demo.web.redis.repo.UIDRepo;
 
 @Repository
 public class UserDataRepo {
 	
 	private static String KEY_PREFIX_USER = "user:";
 	
-	private RedisAtomicLong userid;
+//	private RedisAtomicLong userid;
+//	private UIDRepo uidrepo;
 	
 	private StringRedisTemplate stringRedisTemplate;
 	private RedisTemplate<String, Object> redisTemplate;
@@ -30,6 +33,7 @@ public class UserDataRepo {
 	private HashOperations<String, String, String> srt_hashOps;
 	private SetOperations<String, String> srt_setOps;
 	private ZSetOperations<String, String> srt_zSetOps;
+	private ValueOperations<String, String> srt_valOps;
 	
 	@Resource(name="redisTemplate")
 	private HashOperations<String, String, UserData> rt_hashOps;
@@ -38,7 +42,7 @@ public class UserDataRepo {
 	public UserDataRepo(RedisTemplate<String, Object> redisTemplate, StringRedisTemplate stringRedisTemplate) {
 		this.redisTemplate = redisTemplate;
 		this.stringRedisTemplate = stringRedisTemplate;
-		this.userid = new RedisAtomicLong("userid", stringRedisTemplate.getConnectionFactory());
+		//this.userid = new RedisAtomicLong("userid", stringRedisTemplate.getConnectionFactory());
 	}
 	
 	@PostConstruct
@@ -46,30 +50,41 @@ public class UserDataRepo {
 		srt_hashOps = stringRedisTemplate.opsForHash();
 		srt_setOps = stringRedisTemplate.opsForSet();
 		srt_zSetOps = stringRedisTemplate.opsForZSet();
+		srt_valOps = stringRedisTemplate.opsForValue();
 	}
 
 	public void saveUserData(UserData userdata) {
-		String id = String.valueOf(userid.incrementAndGet());
-		userdata.setId(id);
-		
-		String key = (KEY_PREFIX_USER + id);
-		
-		
+			
+		String key = (KEY_PREFIX_USER + userdata.getId());
 		
 		srt_hashOps.put(key, "name", userdata.getName());
-		srt_hashOps.put(key, "password", userdata.getPassword());
-		
-//		rt_hashOps.put(key, id, userdata);
-				
+		srt_hashOps.put(key, "password", userdata.getPassword());	
 		
 	}
 	
-//	public UserData getUserData(String id) {
-//		UserData userdata = new UserData();
-//		
-//		if (rt_hashOps.get(KEY_PREFIX_USER, KEY_PREFIX_USER + id) != null) {
-//			
-//		}
-//	}
+	public String getName(String id) {
+		String key = KEY_PREFIX_USER + id;
+		
+		if(stringRedisTemplate.hasKey(key)) {
+			return (srt_hashOps.get(key, "name"));
+		}
+		else {
+			//TODO: find suitable return
+			return "";
+		}	
+	}
+	
+	public String getPassword(String id) {
+		
+		String key = KEY_PREFIX_USER + id;
+		
+		if(stringRedisTemplate.hasKey(key)) {
+			return (srt_hashOps.get(key, "password"));
+		}
+		else {
+			//TODO: find suitable return
+			return "";
+		}
+	}
 
 }
