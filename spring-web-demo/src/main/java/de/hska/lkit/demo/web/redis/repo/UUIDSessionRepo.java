@@ -22,6 +22,8 @@ import de.hska.lkit.demo.web.redis.model.UUIDSession;
 public class UUIDSessionRepo {
 
 	private static String KEY_PREFIX_SESSION = "session:";
+	private static String KEY_PREFIX_USER = "user:";
+	private static String KEY_PREFIX_NAME = "name:";
 	
 	private StringRedisTemplate stringRedisTemplate;
 	private RedisTemplate<String, Object> redisTemplate;
@@ -67,7 +69,12 @@ public class UUIDSessionRepo {
 	public void saveSession(UUIDSession uuid) {
 
 		/* TODO DB eintrag des Hashs */
-
+		String key = KEY_PREFIX_SESSION + uuid.getUUID();
+		srt_hashOps.put(key, "userid", uuid.getUserID());
+		
+		//DEBUG
+		System.out.println("I Put the session to key: " + key + " and i wrote " + uuid.getUserID());
+		
 	}
 	
 	
@@ -80,25 +87,44 @@ public class UUIDSessionRepo {
 	}
 	
 	
-	private boolean isExistingUUID(String uuid) {
+	public boolean isExistingUUID(String uuid) {
+		// KEY_PREFIX_SESSION + uuid, String
 		
-		//TODO
+		StringRedisTemplate foo = new StringRedisTemplate();
+		String value = foo.opsForValue().get(KEY_PREFIX_SESSION + uuid);
 		
-		return false;
+		
+		 if(foo.hasKey(KEY_PREFIX_SESSION + uuid)) {
+			  return false;
+		 } else {
+			 return true;
+		 }
 	}
 	
 	private boolean isCorrectLogin(UUIDSession uuid) {
 		
-		//TODO
+		UUIDSession temp = new UUIDSession();
+
+		StringRedisTemplate foo = new StringRedisTemplate();
+		uuid.setUserID(foo.opsForValue().get(KEY_PREFIX_NAME + uuid.getName()));
 		
-		return false;
+		temp.setName(srt_hashOps.get(KEY_PREFIX_USER + uuid.getUserID(), "name"));
+		temp.setPassword(srt_hashOps.get(KEY_PREFIX_USER + uuid.getUserID(), "password"));
+		
+		if( (temp.getName().equals(uuid.getName())) && (temp.getPassword().equals(uuid.getPassword()))) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	
 	private boolean isExistingUser(String name) {
 		
-		//TODO
-		
-		return false;
-	}
+		if(stringRedisTemplate.hasKey(KEY_PREFIX_NAME + name)) {
+			  return true;
+		 } else {
+			 return false;
+		 }
+	}	
 }
