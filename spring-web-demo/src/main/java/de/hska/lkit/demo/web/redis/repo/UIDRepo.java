@@ -82,9 +82,7 @@ public class UIDRepo {
 			System.out.println("did not exist");
 			String id = String.valueOf(getNextUID());
 			
-			srt_hashOps.put(key, "id", id);
-			
-//			srt_setOps.add(KEY_SET_ALL_USERNAMES, name);
+			srt_valOps.set(key, id);
 			
 			UserData userdata = new UserData();
 			userdata.setName(name);
@@ -104,7 +102,6 @@ public class UIDRepo {
 	 * True, if exists.
 	 */
 	private boolean isExistingUser(String name) {
-		System.out.println("does it");
 		String key = KEY_PREFIX_NAME + name + KEY_SUFFIX_USER;
 		
 		if(stringRedisTemplate.hasKey(key)) {
@@ -127,7 +124,8 @@ public class UIDRepo {
 	public String getId(String name) {
 		if(isExistingUser(name)) {
 			System.out.println("exists");
-			return String.valueOf(srt_hashOps.get((KEY_PREFIX_NAME + name + KEY_SUFFIX_USER), "id"));
+//			return String.valueOf(srt_hashOps.get((KEY_PREFIX_NAME + name + KEY_SUFFIX_USER), "id"));
+			return String.valueOf(srt_valOps.get(KEY_PREFIX_NAME + name + KEY_SUFFIX_USER));
 		}
 		return "none";
 	}

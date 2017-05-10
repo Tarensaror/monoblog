@@ -58,9 +58,15 @@ public class FollowRepo {
 		srt_valOps = stringRedisTemplate.opsForValue();
 	}
 	
-	public void follow(String id, String name) {
-		updateFollowersAdd(id, name);
-		updateFollowingAdd(id, name);
+	public boolean follow(String id, String name) {
+		if(!id.equals(uidrepo.getId(name))) {
+			updateFollowersAdd(id, name);
+			updateFollowingAdd(id, name);
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 	
 	public void unfollow(String id, String name) {
