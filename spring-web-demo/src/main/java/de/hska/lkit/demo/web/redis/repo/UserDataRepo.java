@@ -3,6 +3,8 @@ package de.hska.lkit.demo.web.redis.repo;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import java.util.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.RedisZSetCommands.Range;
 import org.springframework.data.redis.core.HashOperations;
@@ -89,4 +91,41 @@ public class UserDataRepo {
 		}
 	}
 
+	public Set<String> findUsersWith(String pattern) {
+
+		System.out.println("Searching for pattern  " + pattern);
+		
+		StringRedisTemplate foo = new StringRedisTemplate(stringRedisTemplate.getConnectionFactory());
+		Set<String> setResult = new HashSet<String>();
+		Set<String> result = new HashSet<String>();
+
+		if(pattern.equals("")){
+			// return all users
+			
+			return foo.keys("*");
+	
+		} else {
+			// search for user with pattern
+			
+			setResult = foo.keys("name:" + "*" + pattern + "*" + ":user");
+			for (Iterator iterator = setResult.iterator(); iterator.hasNext();) {
+				String username = (String) iterator.next();
+				
+				//cut-off pre and suffix
+				System.out.println("key found: " + username);
+				username = username.substring( 5 , username.length() - 5);
+				System.out.println("key cut to: " + username);
+				result.add(username);
+			}
+		}
+		return result;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
 }
