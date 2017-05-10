@@ -25,6 +25,10 @@ public class UUIDSessionRepo {
 	private static String KEY_PREFIX_USER = "user:";
 	private static String KEY_PREFIX_NAME = "name:";
 	
+	private static String KEY_SUFFIX_USER = ":user";
+	private static String KEY_SUFFIX_USERDATA = ":userdata";
+	
+	
 	private StringRedisTemplate stringRedisTemplate;
 	private RedisTemplate<String, Object> redisTemplate;
 	
@@ -57,22 +61,26 @@ public class UUIDSessionRepo {
 		uuid.setPassword(password);
 
 		if (isCorrectLogin(uuid)) {
+			
 			uuid.setUUID(rollUUID());
+			
+			System.out.println("Rolled this UUID:" + uuid.getUUID());
+			
 			saveSession(uuid);
 			
+			
+			System.out.println("Login success");
 			return uuid.getUUID();
 		} else {
+			System.out.println("Login failed");
 			return null;
 		}
 	}
 
 	public void saveSession(UUIDSession uuid) {
-
-		/* TODO DB eintrag des Hashs */
-		String key = KEY_PREFIX_SESSION + uuid.getUUID();
+		String key = KEY_PREFIX_SESSION + uuid.getUUID() + KEY_SUFFIX_USER ;
 		srt_hashOps.put(key, "userid", uuid.getUserID());
 		
-		//DEBUG
 		System.out.println("I Put the session to key: " + key + " and i wrote " + uuid.getUserID());
 		
 	}
@@ -80,25 +88,24 @@ public class UUIDSessionRepo {
 	
 	private String rollUUID() {
 		String temp = UUID.randomUUID().toString();
+		System.out.println("Got this SessionKey:" + temp);
+		
+		System.out.println("entered loop");
 		while(isExistingUUID(temp)) {
 			temp = UUID.randomUUID().toString();
 		}
+		System.out.println("exited loop");
 		return temp;
 	}
 	
 	
-	public boolean isExistingUUID(String uuid) {
-		// KEY_PREFIX_SESSION + uuid, String
-		
+	public boolean isExistingUUID(String uuid) { 	
 		StringRedisTemplate foo = new StringRedisTemplate(stringRedisTemplate.getConnectionFactory());
 		
-		foo.getConnectionFactory();
-		foo.afterPropertiesSet();
+		String value = foo.opsForValue().get(KEY_PREFIX_SESSION + uuid + KEY_SUFFIX_USER);
+		System.out.println("Found this: " + value + " for: " + uuid + "in DB");
 		
-		String value = foo.opsForValue().get(KEY_PREFIX_SESSION + uuid);
-		
-		
-		 if(foo.hasKey(KEY_PREFIX_SESSION + uuid)) {
+		 if(value == null) {
 			  return false;
 		 } else {
 			 return true;
@@ -111,12 +118,19 @@ public class UUIDSessionRepo {
 
 		StringRedisTemplate foo = new StringRedisTemplate(stringRedisTemplate.getConnectionFactory());
 		
-		uuid.setUserID(foo.opsForValue().get(KEY_PREFIX_NAME + uuid.getName()));
+		uuid.setUserID(foo.opsForValue().get(KEY_PREFIX_NAME + uuid.getName() + KEY_SUFFIX_USER));
 		
-		temp.setName(srt_hashOps.get(KEY_PREFIX_USER + uuid.getUserID(), "name"));
-		temp.setPassword(srt_hashOps.get(KEY_PREFIX_USER + uuid.getUserID(), "password"));
+		String tempName = srt_hashOps.get(KEY_PREFIX_USER + uuid.getUserID() + KEY_SUFFIX_USERDATA, "name");
+		String tempPassword = srt_hashOps.get(KEY_PREFIX_USER + uuid.getUserID() + KEY_SUFFIX_USERDATA, "password");
 		
-		if( (temp.getName().equals(uuid.getName())) && (temp.getPassword().equals(uuid.getPassword()))) {
+		System.out.println(tempName);
+		System.out.println(uuid.getName());
+		
+		System.out.println(tempPassword);
+		System.out.println(uuid.getPassword());
+		
+		
+		if(uuid.getName().equals(tempName) && uuid.getPassword().equals(tempPassword)) {
 			return true;
 		} else {
 			return false;
@@ -128,12 +142,17 @@ public class UUIDSessionRepo {
 		
 		StringRedisTemplate foo = new StringRedisTemplate();
 		
-		
-		
-		 if(foo.hasKey(foo.opsForValue().get(KEY_PREFIX_NAME + name))) {
+		 if(foo.hasKey(foo.opsForValue().get(KEY_PREFIX_NAME + name + KEY_SUFFIX_USER))) {
 			  return false;
 		 } else {
 			 return true;
 		 }
 	}
+	
+	public String getUserID(String uuid) {
+		return srt_hashOps.get(KEY_PREFIX_SESSION + uuid + KEY_SUFFIX_USER, "userid");
+	}
+	
+	
+	
 }
