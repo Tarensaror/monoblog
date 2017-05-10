@@ -16,11 +16,16 @@ import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
+import java.util.concurrent.TimeUnit;
+
 import de.hska.lkit.demo.web.redis.model.UUIDSession;
 
 @Repository
 public class UUIDSessionRepo {
 
+	private static long TIMEOUT = 20l;
+	private static TimeUnit UNIT  = TimeUnit.MINUTES;
+	
 	private static String KEY_PREFIX_SESSION = "session:";
 	private static String KEY_PREFIX_USER = "user:";
 	private static String KEY_PREFIX_NAME = "name:";
@@ -78,8 +83,11 @@ public class UUIDSessionRepo {
 	}
 
 	public void saveSession(UUIDSession uuid) {
+		StringRedisTemplate foo = new StringRedisTemplate(stringRedisTemplate.getConnectionFactory());
+		
 		String key = KEY_PREFIX_SESSION + uuid.getUUID() + KEY_SUFFIX_USER ;
 		srt_hashOps.put(key, "userid", uuid.getUserID());
+		foo.expire(key, TIMEOUT, UNIT);
 		
 		System.out.println("I Put the session to key: " + key + " and i wrote " + uuid.getUserID());
 		
@@ -137,10 +145,17 @@ public class UUIDSessionRepo {
 		}
 	}
 	
+	public void refresh(String uuid) {
+		StringRedisTemplate foo = new StringRedisTemplate(stringRedisTemplate.getConnectionFactory());
+		
+		String key = KEY_PREFIX_SESSION + uuid + KEY_SUFFIX_USER ;
+		foo.expire(key, TIMEOUT, UNIT);
+	}
+	
 	
 	private boolean isExistingUser(String name) {
 		
-		StringRedisTemplate foo = new StringRedisTemplate();
+		StringRedisTemplate foo = new StringRedisTemplate(stringRedisTemplate.getConnectionFactory());
 		
 		 if(foo.hasKey(foo.opsForValue().get(KEY_PREFIX_NAME + name + KEY_SUFFIX_USER))) {
 			  return false;
