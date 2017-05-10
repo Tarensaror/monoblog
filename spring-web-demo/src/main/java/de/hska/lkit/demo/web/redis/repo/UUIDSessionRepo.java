@@ -90,7 +90,11 @@ public class UUIDSessionRepo {
 	public boolean isExistingUUID(String uuid) {
 		// KEY_PREFIX_SESSION + uuid, String
 		
-		StringRedisTemplate foo = new StringRedisTemplate();
+		StringRedisTemplate foo = new StringRedisTemplate(stringRedisTemplate.getConnectionFactory());
+		
+		foo.getConnectionFactory();
+		foo.afterPropertiesSet();
+		
 		String value = foo.opsForValue().get(KEY_PREFIX_SESSION + uuid);
 		
 		
@@ -105,7 +109,8 @@ public class UUIDSessionRepo {
 		
 		UUIDSession temp = new UUIDSession();
 
-		StringRedisTemplate foo = new StringRedisTemplate();
+		StringRedisTemplate foo = new StringRedisTemplate(stringRedisTemplate.getConnectionFactory());
+		
 		uuid.setUserID(foo.opsForValue().get(KEY_PREFIX_NAME + uuid.getName()));
 		
 		temp.setName(srt_hashOps.get(KEY_PREFIX_USER + uuid.getUserID(), "name"));
@@ -121,10 +126,14 @@ public class UUIDSessionRepo {
 	
 	private boolean isExistingUser(String name) {
 		
-		if(stringRedisTemplate.hasKey(KEY_PREFIX_NAME + name)) {
-			  return true;
+		StringRedisTemplate foo = new StringRedisTemplate();
+		
+		
+		
+		 if(foo.hasKey(foo.opsForValue().get(KEY_PREFIX_NAME + name))) {
+			  return false;
 		 } else {
-			 return false;
+			 return true;
 		 }
-	}	
+	}
 }
