@@ -34,16 +34,16 @@ public class Result {
         this.userdata = userdata;
     }
 
+    public String getCommand() {
+    	return command;
+    }
+    
     public String getMessage() {
         return message;
     }
     
-    public boolean isSuccessful() {
-    	return success;
-    }
-    
     public boolean isSuccess() {
-    	return isSuccessful();
+    	return success;
     }
     
     public Object getUserdata() {

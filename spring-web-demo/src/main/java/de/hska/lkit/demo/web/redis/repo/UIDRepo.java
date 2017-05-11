@@ -101,7 +101,7 @@ public class UIDRepo {
 	 * Checks whether user already exists.
 	 * True, if exists.
 	 */
-	private boolean isExistingUser(String name) {
+	public boolean isExistingUser(String name) {
 		String key = KEY_PREFIX_NAME + name + KEY_SUFFIX_USER;
 		
 		if(stringRedisTemplate.hasKey(key)) {
@@ -127,7 +127,7 @@ public class UIDRepo {
 //			return String.valueOf(srt_hashOps.get((KEY_PREFIX_NAME + name + KEY_SUFFIX_USER), "id"));
 			return String.valueOf(srt_valOps.get(KEY_PREFIX_NAME + name + KEY_SUFFIX_USER));
 		}
-		return "none";
+		return null;
 	}
 	
 	
