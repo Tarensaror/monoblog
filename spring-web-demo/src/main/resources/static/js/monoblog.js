@@ -21,11 +21,11 @@ function send_input() {
 	
 	switch(state) {
 	case Status.READY:
-		if (!send_input.hide) write_output(command);
+		write_output(send_input.hide ? '' : command);
 		send_request(command);
 		break;
 	case Status.BLOCKED:
-		if (!send_input.hide) write_output(command);
+		write_output(send_input.hide ? '' : command);
 		break;
 	}
 }
@@ -43,7 +43,7 @@ document.getElementById('command_form').addEventListener('submit', submitHandler
 
 
 
-var client, token;
+var client, token, last_command, cwd = '/';
 
 function connect() {
 	write_output('MAINFRAME CONNECTING.');
@@ -58,9 +58,15 @@ function connect() {
         client.subscribe('/user/queue/replies', function(reply) {
         	state = Status.READY
         	var data = JSON.parse(reply.body);
-            write_output(data.message);
-            
-            if (data.success && data.command == 'login') token = data.userdata;
+            write_output(data.message == null ? '' : data.message);
+            alert('Received from remote: ' + JSON.stringify(data));
+            if (data.success) {
+            	if (data.command == 'login') {
+            		token = data.userdata[0];
+            		cwd = '/home/' + data.userdata[1] + '/';
+            	}
+            	last_command = data.command;
+            }
         });
     });
 }
@@ -85,7 +91,7 @@ function login_process(input) {
 	case 'NAME':
 		write_output('Password: ', false);
 		login_process.state = 'PASSWORD';
-		login_procecss.name = input;
+		login_process.username = input;
 		document.getElementById('command').type = 'password';
 		send_input.hide = true;
 		break;
@@ -94,8 +100,8 @@ function login_process(input) {
 		document.getElementById('command').type = 'text';
 		send_input.hide = false;
 		request_handler = default_command_handler;
-		remote_process({'command' : 'login', 'arguments' : login_process.name + ' ' + input});
-		login_process.name = null;
+		remote_process({'command' : 'login', 'arguments' : login_process.username + ' ' + input});
+		login_process.username = null;
 		break;
 	}
 }
@@ -112,7 +118,7 @@ function register_process(input) {
 	case 'NAME':
 		write_output('Password: ', false);
 		register_process.state = 'PASSWORD';
-		register_process.name = input;
+		register_process.username = input;
 		document.getElementById('command').type = 'password';
 		send_input.hide = true;
 		break;
@@ -126,8 +132,8 @@ function register_process(input) {
 		document.getElementById('command').type = 'text';
 		send_input.hide = false;
 		request_handler = default_command_handler;
-		remote_process({'command' : 'register', 'arguments' : register_process.name + ' ' + register_process.password + ' ' + input});
-		register_process.name = register_process.password = null;
+		remote_process({'command' : 'register', 'arguments' : register_process.username + ' ' + register_process.password + ' ' + input});
+		register_process.username = register_process.password = null;
 		break;
 	}
 }
@@ -135,6 +141,8 @@ function register_process(input) {
 function remote_process(command) {
 	state = Status.BLOCKED;
 	command.token = token;
+	command.last_command = last_command;
+
 	client.send('/app/command', {}, JSON.stringify(command));
 }
 
@@ -145,7 +153,10 @@ function parse_command_line(command_line) {
 	var command = command_line.substr(0, space_index);
 	var arguments = command_line.substr(space_index + 1).trimLeft();
 	
-	if (space_index == -1) arguments = '';
+	if (space_index == -1) {
+		command = arguments;
+		arguments = '';
+	}
 	if (command == '') return {};
 	
 	return {'command' : command, 'arguments' : arguments};
