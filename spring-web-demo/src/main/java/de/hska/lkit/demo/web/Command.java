@@ -4,6 +4,7 @@ import de.hska.lkit.demo.web.redis.repo.UIDRepo;
 import de.hska.lkit.demo.web.redis.repo.UUIDSessionRepo;
 import de.hska.lkit.demo.web.redis.repo.UserDataRepo;
 import de.hska.lkit.demo.web.redis.repo.FollowRepo;
+import de.hska.lkit.demo.web.redis.repo.PostRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.util.List;
@@ -15,13 +16,15 @@ public class Command {
 	private final UUIDSessionRepo uuidSessionRepository;
 	private final UserDataRepo userDataRepository;
 	private final FollowRepo followRepository;
+	private final PostRepo postRepository;
 	
 	@Autowired
-	public Command(UIDRepo uidRepository, UUIDSessionRepo uuidSessionRepository, UserDataRepo userDataRepository, FollowRepo followRepository) {
+	public Command(UIDRepo uidRepository, UUIDSessionRepo uuidSessionRepository, UserDataRepo userDataRepository, FollowRepo followRepository, PostRepo postRepository) {
 		this.uidRepository = uidRepository;
 		this.uuidSessionRepository = uuidSessionRepository;
 		this.userDataRepository = userDataRepository;
 		this.followRepository = followRepository;
+		this.postRepository = postRepository;
 	}
 	
 	private String getSessionUserName(String token) {
@@ -34,6 +37,8 @@ public class Command {
 		String[] arguments = request.getArguments().split("(\\s)+");
 		if (arguments.length == 1 && arguments[0].equals("")) arguments = new String[] {};
 		String token = request.getToken();
+		
+		if (token != null) uuidSessionRepository.refresh(token);
 		
 		System.out.println(command + " " + request.getArguments() + " " + token);
 		
@@ -111,7 +116,7 @@ public class Command {
 		StringBuilder message = new StringBuilder();
 		message.append("Follower:\n\n");
 		
-		if (followers.size() == 0) message.append("No followers!");
+		if (followers.size() == 0) message.append("Everybody hates you!");
 		else for (String follower : followers) message.append(follower).append('\n');
 		
 		return new Result(command, message.toString(), false);		
@@ -134,13 +139,22 @@ public class Command {
 		StringBuilder message = new StringBuilder();
 		message.append("Following:\n\n");
 		
-		for (String fellow : following) message.append(fellow).append('\n');
+		if (following.size() == 0) message.append("You're all lonely and hate everybody!");
+		else for (String fellow : following) message.append(fellow).append('\n');
 		
 		return new Result(command, message.toString(), false);	
 	}
 	
 	private Result post(String command, String[] arguments, String token) {
-		return null;
+		if (arguments.length != 1) return new Result(command, "Invalid amount of operands given", false);
+
+		String name = getSessionUserName(token);
+		if (name == null) return new Result(command, "Authentication required", false);
+	
+		if (arguments[0].length() > 140) return new Result(command, "Don't waste the precious memory... You're running on a 64k RAM machine!", false);
+		
+		postRepository.createPost(name, arguments[0]);
+		return new Result(command, true);
 	}
 	
 	private Result logout(String command, String[] arguments, String token) {
