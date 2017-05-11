@@ -184,7 +184,7 @@ public class Command {
 		
 		Integer lowestPostId = Integer.MAX_VALUE;
 		StringBuilder message = new StringBuilder();
-		List<String> postIds = postRepository.getPostsByUserBefore(name, id, 2);
+		List<String> postIds = postRepository.getPostsByUserBefore(name, id, 5);
 		for (String postId : postIds) {
 			Post post = postRepository.getPost(postId);
 			message.append("\n\nAuthor: ").append(post.getName()).append(" Date: ").append(post.getTime())
@@ -216,7 +216,7 @@ public class Command {
 		
 		Integer lowestPostId = Integer.MAX_VALUE;
 		StringBuilder message = new StringBuilder();
-		List<String> postIds = timelineRepository.getTimelineByUserBefore(userId, id, 2);
+		List<String> postIds = timelineRepository.getTimelineByUserBefore(userId, id, 5);
 		for (String postId : postIds) {
 			Post post = postRepository.getPost(postId);
 			message.append("\n\nAuthor: ").append(post.getName()).append(" Date: ").append(post.getTime())

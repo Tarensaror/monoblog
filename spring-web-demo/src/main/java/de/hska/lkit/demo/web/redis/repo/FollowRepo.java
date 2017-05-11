@@ -94,17 +94,17 @@ public class FollowRepo {
 		
 	}
 	
-	private void updateFollowersDelete(String idOfCurrentUser, String name) {
-		String key = KEY_PREFIX_USER + idOfCurrentUser + KEY_SUFFIX_FOLLOWER;
+	private void updateFollowingDelete(String idOfCurrentUser, String name) {
+		String key = KEY_PREFIX_USER + idOfCurrentUser + KEY_SUFFIX_FOLLOWING;
 		srt_setOps.remove(key, name);
 		
 	}
 	
-	private void updateFollowingDelete(String idOfCurrentUser, String name) {
+	private void updateFollowersDelete(String idOfCurrentUser, String name) {
 		String userName = userdatarepo.getName(idOfCurrentUser);
 		String otherUserId = uidrepo.getId(name);
 		
-		String userKey = KEY_PREFIX_USER + otherUserId + KEY_SUFFIX_FOLLOWING;
+		String userKey = KEY_PREFIX_USER + otherUserId + KEY_SUFFIX_FOLLOWER;
 		srt_setOps.remove(userKey, userName);
 	}
 	
