@@ -59,14 +59,18 @@ public class FollowRepo {
 	}
 	
 	public boolean follow(String id, String name) {
-		if(!id.equals(uidrepo.getId(name))) {
+		if(uidrepo.isExistingUser(name)) {
+			if(!id.equals(uidrepo.getId(name))) {
 			updateFollowersAdd(id, name);
 			updateFollowingAdd(id, name);
 			return true;
+			}
+			else {
+				return false;
+			}
 		}
-		else {
-			return false;
-		}
+		return false;
+		
 	}
 	
 	public void unfollow(String id, String name) {
