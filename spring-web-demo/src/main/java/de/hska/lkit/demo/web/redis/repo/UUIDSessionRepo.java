@@ -152,6 +152,14 @@ public class UUIDSessionRepo {
 		foo.expire(key, TIMEOUT, UNIT);
 	}
 	
+	public void logout(String uuid) {
+		StringRedisTemplate foo = new StringRedisTemplate(stringRedisTemplate.getConnectionFactory());
+		
+		String key = KEY_PREFIX_SESSION + uuid + KEY_SUFFIX_USER ;
+		foo.delete(key);
+	}
+	
+	
 	
 	private boolean isExistingUser(String name) {
 		
