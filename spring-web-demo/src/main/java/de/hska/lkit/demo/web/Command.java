@@ -144,7 +144,8 @@ public class Command {
 	}
 	
 	private Result logout(String command, String[] arguments, String token) {
-		return null;
+		uuidSessionRepository.logout(token);
+		return new Result(command, true);
 	}
 	
 	private Result profile(String command, String[] arguments, String token) {

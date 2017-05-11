@@ -65,6 +65,9 @@ function connect() {
             		token = data.userdata[0];
             		cwd = '/home/' + data.userdata[1] + '/';
             	}
+            	else if (data.command == 'logout') {
+            		token = null;
+            	}
             	last_command = data.command;
             }
         });
