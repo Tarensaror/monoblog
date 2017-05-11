@@ -5,6 +5,7 @@ import de.hska.lkit.demo.web.redis.repo.UUIDSessionRepo;
 import de.hska.lkit.demo.web.redis.repo.UserDataRepo;
 import de.hska.lkit.demo.web.redis.repo.FollowRepo;
 import de.hska.lkit.demo.web.redis.repo.PostRepo;
+import de.hska.lkit.demo.web.redis.repo.TimelineRepo;
 import de.hska.lkit.demo.web.redis.model.Post;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,14 +20,16 @@ public class Command {
 	private final UserDataRepo userDataRepository;
 	private final FollowRepo followRepository;
 	private final PostRepo postRepository;
+	private final TimelineRepo timelineRepository;
 	
 	@Autowired
-	public Command(UIDRepo uidRepository, UUIDSessionRepo uuidSessionRepository, UserDataRepo userDataRepository, FollowRepo followRepository, PostRepo postRepository) {
+	public Command(UIDRepo uidRepository, UUIDSessionRepo uuidSessionRepository, UserDataRepo userDataRepository, FollowRepo followRepository, PostRepo postRepository, TimelineRepo timelineRepository) {
 		this.uidRepository = uidRepository;
 		this.uuidSessionRepository = uuidSessionRepository;
 		this.userDataRepository = userDataRepository;
 		this.followRepository = followRepository;
 		this.postRepository = postRepository;
+		this.timelineRepository = timelineRepository;
 	}
 	
 	private String getSessionUserName(String token) {
@@ -41,8 +44,6 @@ public class Command {
 		String token = request.getToken();
 		
 		if (token != null) uuidSessionRepository.refresh(token);
-		
-		System.out.println(command + " " + request.getArguments() + " " + token);
 		
 		switch(command) {
 		case "register": return register(command, arguments, token);
@@ -195,7 +196,35 @@ public class Command {
 	}
 	
 	private Result timeline(String command, String[] arguments, String token) {
-		return null;
+		String name = null, id = null;
+		
+		if (arguments.length == 2) {
+			name = arguments[0];
+			id = arguments[1];
+		}
+		else if (arguments.length == 1) {
+			name = arguments[0];		
+		}
+		else if (arguments.length == 0) {
+			name = getSessionUserName(token);
+		}
+		
+		if (id == null) id = ((Integer) Integer.MAX_VALUE).toString();
+		if (name == null) return new Result(command, "Invalid amount of operands given or authentication required", false);
+		String userId = uidRepository.getId(name);
+		if (userId == null) return new Result(command, "No such name", false);
+		
+		Integer lowestPostId = Integer.MAX_VALUE;
+		StringBuilder message = new StringBuilder();
+		List<String> postIds = timelineRepository.getTimelineByUserBefore(userId, id, 2);
+		for (String postId : postIds) {
+			Post post = postRepository.getPost(postId);
+			message.append("\n\nAuthor: ").append(post.getName()).append(" Date: ").append(post.getTime())
+				.append("\n").append(post.getMessage());
+			lowestPostId = Integer.parseInt(postId);
+		}
+		
+		return new Result(command, message.toString(), true, (Object) new String[]{name, lowestPostId.toString()});
 	}
 	
 	private Result more(String command, String lastCommand, String[] arguments, String token) {

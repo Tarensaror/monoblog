@@ -59,7 +59,7 @@ function connect() {
         	state = Status.READY
         	var data = JSON.parse(reply.body);
             write_output(data.message == null ? '' : data.message);
-            alert('Received from remote: ' + JSON.stringify(data));
+
             if (data.success) {
             	if (data.command == 'login') {
             		token = data.userdata[0];
