@@ -112,7 +112,15 @@ public class PostRepo {
 		int maxID = Integer.valueOf(id);
 	
 		String key = KEY_PREFIX_USER + uidRepository.getId(username) + KEY_SUFFIX_POST;
-		Set<String> postIds = srt_setOps.members(key);
+		Set<String> posts = srt_setOps.members(key);
+		Set<String> postIds = new HashSet<String>();
+		for(String anId: posts) {
+			if(Integer.valueOf(anId) < maxID) {
+				postIds.add(anId);
+			}
+		}
+		
+		
 		ArrayList<String> result = new ArrayList<String>(postIds);
 		
 		result.sort(new Comparator<String>() {
