@@ -8,6 +8,7 @@ import de.hska.lkit.demo.web.redis.repo.PostRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class Command {
@@ -179,7 +180,21 @@ public class Command {
 	}
 	
 	private Result find(String command, String[] arguments, String token) {
-		return null;
+		if (arguments.length != 1) return new Result(command, "Invalid amount of operands given", false);
+		
+		Set<String> users = userdataRepository.findUsersWith(arguments[0]);
+
+		StringBuilder message = new StringBuilder();
+		message.append("Matches:\n\n");
+		
+		if (users.size() == 0) message.append("(>*.*)> none <(*.*<)");
+		else {
+			for (String user : users) {
+				message.append(user).append('\n');
+			}
+		}
+		
+		return new Result(command, message.toString(), true);
 	}
 	
 	private Result noSuchCommand(String command, String[] arguments, String token) {

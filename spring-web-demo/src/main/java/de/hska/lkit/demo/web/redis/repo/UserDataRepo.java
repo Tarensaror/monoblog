@@ -74,7 +74,7 @@ public class UserDataRepo {
 		}
 		else {
 			//TODO: find suitable return
-			return "";
+			return null;
 		}	
 	}
 	
