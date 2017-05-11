@@ -28,6 +28,7 @@ import org.springframework.stereotype.Repository;
 import de.hska.lkit.demo.web.redis.model.UserData;
 import de.hska.lkit.demo.web.redis.model.Post;
 import de.hska.lkit.demo.web.redis.repo.UIDRepo;
+import de.hska.lkit.demo.web.redis.repo.TimelineRepo;
 
 @Repository
 public class PostRepo {
@@ -38,6 +39,7 @@ public class PostRepo {
 	
 	private RedisAtomicLong postid;
 	private UIDRepo uidRepository;
+	private TimelineRepo timeline;
 	
 	private StringRedisTemplate stringRedisTemplate;
 	private RedisTemplate<String, Object> redisTemplate;
@@ -51,11 +53,12 @@ public class PostRepo {
 	private HashOperations<String, String, UserData> rt_hashOps;
 	
 	@Autowired
-	public PostRepo(RedisTemplate<String, Object> redisTemplate, StringRedisTemplate stringRedisTemplate, UIDRepo uidrepo) {
+	public PostRepo(RedisTemplate<String, Object> redisTemplate, StringRedisTemplate stringRedisTemplate, UIDRepo uidrepo, TimelineRepo timeline) {
 		this.redisTemplate = redisTemplate;
 		this.stringRedisTemplate = stringRedisTemplate;
 		this.postid = new RedisAtomicLong("postid", stringRedisTemplate.getConnectionFactory());
 		this.uidRepository = uidrepo;
+		this.timeline = timeline;
 	}
 	
 	@PostConstruct
@@ -78,6 +81,9 @@ public class PostRepo {
 		
 		String userPostKey = KEY_PREFIX_USER + uidRepository.getId(name) + KEY_SUFFIX_POST;
 		srt_setOps.add(userPostKey, id);		
+		
+		timeline.updateTimelines(uidRepository.getId(name), id);
+	
 	}
 	
 	public Post getPost(String postID) {
