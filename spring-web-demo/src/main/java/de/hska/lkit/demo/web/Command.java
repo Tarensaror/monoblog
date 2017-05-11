@@ -146,7 +146,7 @@ public class Command {
 	}
 	
 	private Result post(String command, String[] arguments, String token) {
-		if (arguments.length != 1) return new Result(command, "Invalid amount of operands given", false);
+		if (arguments.length == 0) return new Result(command, "Invalid amount of operands given", false);
 
 		String name = getSessionUserName(token);
 		if (name == null) return new Result(command, "Authentication required", false);
