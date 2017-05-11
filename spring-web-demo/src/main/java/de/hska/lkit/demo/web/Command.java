@@ -5,6 +5,7 @@ import de.hska.lkit.demo.web.redis.repo.UUIDSessionRepo;
 import de.hska.lkit.demo.web.redis.repo.UserDataRepo;
 import de.hska.lkit.demo.web.redis.repo.FollowRepo;
 import de.hska.lkit.demo.web.redis.repo.PostRepo;
+import de.hska.lkit.demo.web.redis.model.Post;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.util.List;
@@ -52,7 +53,6 @@ public class Command {
 		case "follows": return follows(command, arguments, token);
 		case "post": return post(command, arguments, token);
 		case "logout": return logout(command, arguments, token);
-		case "profile": return profile(command, arguments, token);
 		case "posts": return posts(command, arguments, token);
 		case "timeline": return timeline(command, arguments, token);
 		case "more": return more(command, request.getLastCommand(), arguments, token);
@@ -152,9 +152,10 @@ public class Command {
 		String name = getSessionUserName(token);
 		if (name == null) return new Result(command, "Authentication required", false);
 	
-		if (arguments[0].length() > 140) return new Result(command, "Don't waste the precious memory... You're running on a 64k RAM machine!", false);
+		String message = String.join(" ", arguments);
+		if (message.length() > 140) return new Result(command, "Don't waste the precious memory... You're running on a 64k RAM machine!", false);
 		
-		postRepository.createPost(name, arguments[0]);
+		postRepository.createPost(name, message);
 		return new Result(command, true);
 	}
 	
@@ -162,13 +163,35 @@ public class Command {
 		uuidSessionRepository.logout(token);
 		return new Result(command, true);
 	}
-	
-	private Result profile(String command, String[] arguments, String token) {
-		return null;
-	}
-	
+
 	private Result posts(String command, String[] arguments, String token) {
-		return null;
+		String name = null, id = null;
+		
+		if (arguments.length == 2) {
+			name = arguments[0];
+			id = arguments[1];
+		}
+		else if (arguments.length == 1) {
+			name = arguments[0];		
+		}
+		else if (arguments.length == 0) {
+			name = getSessionUserName(token);
+		}
+		
+		if (id == null) id = ((Integer) Integer.MAX_VALUE).toString();
+		if (name == null) return new Result(command, "Invalid amount of operands given or authentication required", false);
+		
+		Integer lowestPostId = Integer.MAX_VALUE;
+		StringBuilder message = new StringBuilder();
+		List<String> postIds = postRepository.getPostsByUserBefore(name, id, 2);
+		for (String postId : postIds) {
+			Post post = postRepository.getPost(postId);
+			message.append("\n\nAuthor: ").append(post.getName()).append(" Date: ").append(post.getTime())
+				.append("\n").append(post.getMessage());
+			lowestPostId = Integer.parseInt(postId);
+		}
+		
+		return new Result(command, message.toString(), true, (Object) new String[]{name, lowestPostId.toString()});
 	}
 	
 	private Result timeline(String command, String[] arguments, String token) {
@@ -176,13 +199,25 @@ public class Command {
 	}
 	
 	private Result more(String command, String lastCommand, String[] arguments, String token) {
-		return null;
+		if (arguments.length != 2) return new Result(command, "Invalid amount of operands given", false);
+		
+		if (lastCommand == null || !lastCommand.equals("posts") && !lastCommand.equals("timeline")) {
+			return new Result(command, "Works only with posts and timeline commands", false);
+		}
+		
+		Result result = new Result(lastCommand, false);
+		switch(lastCommand) {
+		case "posts": result = posts(lastCommand, arguments, token); break;
+		case "timeline": result = timeline(lastCommand, arguments, token); break;
+		}
+		
+		return new Result(lastCommand, result.getMessage(), result.isSuccess(), result.getUserdata());
 	}
 	
 	private Result find(String command, String[] arguments, String token) {
 		if (arguments.length != 1) return new Result(command, "Invalid amount of operands given", false);
 		
-		Set<String> users = userdataRepository.findUsersWith(arguments[0]);
+		Set<String> users = userDataRepository.findUsersWith(arguments[0]);
 
 		StringBuilder message = new StringBuilder();
 		message.append("Matches:\n\n");

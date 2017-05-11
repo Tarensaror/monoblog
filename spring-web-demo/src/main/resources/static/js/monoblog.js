@@ -43,7 +43,7 @@ document.getElementById('command_form').addEventListener('submit', submitHandler
 
 
 
-var client, token, last_command, cwd = '/';
+var client, token, last_command, cwd = '/', more_name, more_id;
 
 function connect() {
 	write_output('MAINFRAME CONNECTING.');
@@ -67,6 +67,10 @@ function connect() {
             	}
             	else if (data.command == 'logout') {
             		token = null;
+            	}
+            	else if (data.command == 'posts' || data.command == 'timeline') {
+            		more_name = data.userdata[0];
+            		more_id = data.userdata[1];
             	}
             	last_command = data.command;
             }
@@ -144,7 +148,9 @@ function register_process(input) {
 function remote_process(command) {
 	state = Status.BLOCKED;
 	command.token = token;
-	command.last_command = last_command;
+	command.lastCommand = last_command;
+	
+	if (command.command == 'more') command.arguments = more_name + ' ' + more_id;
 
 	client.send('/app/command', {}, JSON.stringify(command));
 }
