@@ -43,7 +43,7 @@ document.getElementById('command_form').addEventListener('submit', submitHandler
 
 
 
-var client, token, last_command, cwd = '/', more_name, more_id, following = {};
+var client, token, last_command, cwd = '/', more_name, more_id;
 
 function connect() {
 	write_output('MAINFRAME CONNECTING.');
@@ -62,33 +62,15 @@ function connect() {
 
             if (data.success) {
             	if (data.command == 'login') {
-            		token = data.userdata.token;
-            		cwd = '/home/' + data.userdata.name + '/';
+            		token = data.userdata[0];
+            		cwd = '/home/' + data.userdata[1] + '/';
             		
-            		for (var key in data.userdata.following) {
-            			following[data.userdata.following[key]] = client.subscribe('/topic/postannounce/' + data.userdata.following[key],
-            				function(announcement) {
-            					write_output(announcement.body + ' has posted a new message.');
-            				});
-            		}
-            	}
-            	else if (data.command == 'follow') {
-            		following[data.userdata] = client.subscribe('/topic/postannounce/' + data.userdata,
-            				function(announcement) {
-            					write_output(announcement.body + ' has posted a new message.');
-            				}
-            		);
+            		client.subscribe('/topic/postannounce/foobar', function(announcement) {
+            			alert('gesas new post from ' + announcement);
+            		};
             	}
             	else if (data.command == 'logout') {
             		token = null;
-            		for (var key in following) {
-            			following[key].unsubscribe();
-            		}
-            		following = {};
-            	}
-            	else if (data.command == 'unfollow') {
-            		following[data.userdata].unsubscribe();
-            		following[data.userdata] = null;
             	}
             	else if (data.command == 'posts' || data.command == 'timeline') {
             		more_name = data.userdata[0];

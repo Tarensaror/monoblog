@@ -79,11 +79,15 @@ public class PostRepo {
 		srt_hashOps.put(key, "author", name);
 		srt_hashOps.put(key, "message", message);
 		
-		String userPostKey = KEY_PREFIX_USER + uidRepository.getId(name) + KEY_SUFFIX_POST;
+		String uid = uidRepository.getId(name);
+		
+		String userPostKey = KEY_PREFIX_USER + uid + KEY_SUFFIX_POST;
 		srt_setOps.add(userPostKey, id);		
 		
-		timeline.updateTimelines(uidRepository.getId(name), id);
+		timeline.updateTimelines(uid, id);
 	
+		stringRedisTemplate.convertAndSend("createmessage", name);
+		
 	}
 	
 	public Post getPost(String postID) {

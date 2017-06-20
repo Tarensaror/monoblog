@@ -76,7 +76,7 @@ public class Command {
 		if (token != null) return new Result(command, "Already loged in", false);
 		
 		token = uuidSessionRepository.login(arguments[0], arguments[1]);
-		if (token != null) return new Result(command, (Object) new String[]{token, getSessionUserName(token)});
+		if (token != null) return new Result(command, (Object) new LoginResponse(token, getSessionUserName(token), followRepository.getFollowing(uuidSessionRepository.getUserID(token))));
 		return new Result(command, "Authentication error", false);
 	}
 	
@@ -86,7 +86,7 @@ public class Command {
 		String id = uuidSessionRepository.getUserID(token);
 		if (id == null) return new Result(command, "Authentication required", false);
 		
-		if (followRepository.follow(id, arguments[0])) return new Result(command, true);
+		if (followRepository.follow(id, arguments[0])) return new Result(command, (Object) arguments[0]);
 		return new Result(command, "Failure", false);
 	}
 	
@@ -98,7 +98,7 @@ public class Command {
 		
 		followRepository.unfollow(id, arguments[0]);
 		
-		return new Result(command, true);
+		return new Result(command, (Object) arguments[0]);
 	}
 	
 	private Result follower(String command, String[] arguments, String token) {
